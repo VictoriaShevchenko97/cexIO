@@ -14,5 +14,5 @@ module.exports = {
         __filename: false,
     }
     ,target: 'node'
-    ,externals: [  ]
+    ,externals: [ "express", "ws" ]
 };
