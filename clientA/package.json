@@ -1,0 +1,19 @@
+{
+  "name": "clienta",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc && webpack-cli --config=webpack.config.js",
+    "start": "node clientA.js"
+  },
+  "author": "Victoria",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^12.7.2",
+    "typescript": "^3.6.2",
+    "webpack": "^4.39.3",
+    "webpack-cli": "^3.3.7"
+  }
+}
