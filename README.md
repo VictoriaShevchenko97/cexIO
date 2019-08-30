@@ -3,12 +3,14 @@ Task for CEX.IO
 
 INSTALLATION
 ------------
+For caching of information you need redis server.
+For Windows - https://github.com/rgl/redis/downloads
+Before start server - run redis server
 
 
-
-REQUIREMENTS
+CONFIGURATION
 ------------
-
+All configuration info in config files in 3 part of system(server, clientA, clientB)
 
 
 QUICK START

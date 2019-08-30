@@ -25,6 +25,8 @@ describe("POST-requests", () => {
             }
             expect(resp.status).to.equal("ok");
             expect(resp.data.sessionId).to.be;
+            console.dir(resp);
+            expect(typeof resp.data.sessionId).to.equal("string");
             done();
           });
     });

@@ -1,4 +1,6 @@
 {
     "httpPort": 3000,
-    "wsPort": 3001
+    "wsPort": 3001,
+    "redisPort": 6379,
+    "host": "127.0.0.1"
 }

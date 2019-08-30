@@ -18,8 +18,9 @@ export class WSSocketProcessor extends EventEmitter {
             resolve(this.wss.listenerCount);
         });
     }
-}
 
-// exports.createSocket = (conf: IConfig) => {
-//     return new WSSocketProcessor(conf);
-// };
+    public closeConnection() {
+        this.wss.removeAllListeners();
+        this.wss.close();
+    }
+}
