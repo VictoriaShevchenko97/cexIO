@@ -17,10 +17,15 @@ try {
 
 const middleWares = new MiddleWares(config);
 const wsProcessor = new WSSocketProcessor(config);
-const httpServer = new HttpServer(config, middleWares._app);
+const httpServer = new HttpServer(config, middleWares._app, wsProcessor._token);
 
 
-
+process.on("SIGINT", () => {
+    console.log("exiting...");
+    wsProcessor.closeConnection();
+    middleWares.stopRedisClient();
+    process.exit();
+});
 
 
 

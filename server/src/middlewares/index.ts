@@ -1,6 +1,7 @@
 
 const express = require("express");
 const session = require("express-session");
+const bodyParser = require("body-parser");
 const cors = require("cors");
 const RedisStore = require("connect-redis")(session);
 
@@ -32,13 +33,21 @@ export class MiddleWares extends EventEmitter {
     }
 
     private async configApp(): Promise<void> {
-        this.app.use(cors());
+        // this.app.use(cors());
+        this.app.use(bodyParser.urlencoded({ extended: true }));
+        this.app.use(express.json());
+        this.app.use(bodyParser.json());
         const sessionStore =  new RedisStore({ host: this.config.host, port: this.config.redisPort, client: this.redisClient });
         this.app.use(new session({
+            name: "sid",
             secret: "kqsdjfmlksdhfhzirzeoibrzecrbzuzefcuercazeafxzeokwdfzeijfxcerig",
             store: sessionStore,
-            resave: true,
-            saveUninitialized: true
+            cookie: {
+                secure: false,
+                maxAge: 3600000
+            },
+            resave: false,
+            saveUninitialized: false
         }));
         return Promise.resolve();
     }
@@ -55,5 +64,9 @@ export class MiddleWares extends EventEmitter {
             console.log("Redis connection closed");
         });
     }
+    public stopRedisClient() {
+        this.redisClient.end();
+    }
+
 
 }
