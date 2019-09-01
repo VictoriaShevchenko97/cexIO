@@ -47,11 +47,13 @@ export class HttpServer extends EventEmitter {
             req.session.login = req.sessionID;
             return resultOk(res, {sessionId: req.session.login});
         });
+
         this.app.post("/logout", (req: any, res: any) => {
             req.session.destroy();
             req.logout();
             return resultOk(res, {});
         });
+
         // TODO: try in try??? seriously?
         this.app.post("/subscribe", (req: any, res: any) => {
             try {
@@ -73,6 +75,7 @@ export class HttpServer extends EventEmitter {
             }
             return resultOk(res, {token: this.token});
         });
+
         this.app.post("/upload", async (req: any, res: any) => {
             try {
                 try {
@@ -93,14 +96,13 @@ export class HttpServer extends EventEmitter {
                 }
             } catch (error) {
                 console.log("error");
-                
             }
-            
         });
+
         this.app.all((req: any, res: any) => {
             return error(res, 400, WRONG_FORMAT);
         });
-        
+
         this.app.listen(this.config.httpPort, () => {
             console.log("\x1b[36m", `Server is listening on ${this.config.httpPort}\n`);
             console.log("\x1b[37m", "");
@@ -135,6 +137,7 @@ function error(res: any, statusCode: number, errMsg: string) {
     res.status(statusCode);
     res.send(JSON.stringify({status: "error", error: errMsg }));
 }
+
 function resultOk(res: any, data?: any) {
     res.status(200);
     res.send(JSON.stringify({status: "ok", data}));

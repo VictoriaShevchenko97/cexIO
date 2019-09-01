@@ -15,8 +15,7 @@ const MIN_UPTIME = 3000;
 const commandBefore = 'npm install --no-warnings && npm run build';
 const folders= [
     __dirname + '/server',
-    __dirname + '/clientA',
-    __dirname + '/clientB'
+    __dirname + '/client'
 ];
 
 // ... и после него

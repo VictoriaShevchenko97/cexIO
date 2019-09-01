@@ -163,8 +163,8 @@ describe("POST-requests", () => {
     });
 
     it("WRONG_FORMAT", (done) => {
-        let bigFile = fs.readFileSync("./diplom.txt", 'utf8');
-        let sizeOfFile = fs.statSync("./diplom.txt").size;
+        let bigFile = fs.readFileSync(path.join(__dirname, "../../../","tolstoy.txt"), 'utf8');
+        let sizeOfFile = fs.statSync(path.join(__dirname, "../../../","tolstoy.txt")).size;
         request.post({
             url: FULL_URL + "/upload",
             json: true,
@@ -186,10 +186,10 @@ describe("POST-requests", () => {
     });
 
     it("Send file partial", (done) => {
-            let bigFileSize = fs.statSync("./diplom.txt").size; // in Bytes
+            let bigFileSize = fs.statSync(path.join(__dirname, "../../../","tolstoy.txt")).size; // in Bytes
             console.log(bigFileSize);
             
-            let stream = fs.createReadStream("./diplom.txt", { encoding: "utf-8", flags: "r" });
+            let stream = fs.createReadStream(path.join(__dirname, "../../../","tolstoy.txt"), { encoding: "utf-8", flags: "r" });
             stream.on("data", (data)=>{
                 console.log("data");
                 
@@ -229,17 +229,3 @@ describe("POST-requests", () => {
         
     }).timeout(15000);
 });
-
-function readPartOfFile(start) {
-    return new Promise((resolve, reject) => {
-        // let stream = fs.createReadStream("./diplom.txt", { encoding: "utf-8", start, end: start + (1024 * 1024) });
-        // stream.on("error", err => reject(err));
-        // stream.on("data", (chunk) => {
-        //     console.log("chunk");
-            
-        //     resolve(chunk)});
-
-        
-
-      });
-}

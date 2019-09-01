@@ -11,6 +11,7 @@ export function uploadDataInFile(sessionId: string, originNameFile: string, data
             let currentSize = (fs.statSync(fullFileName)).size;
             if (originSize !== currentSize) {
                 fs.appendFileSync(fullFileName, data);
+                currentSize = (fs.statSync(fullFileName)).size;
             }
             resolve(currentSize);
         } catch (error) {
