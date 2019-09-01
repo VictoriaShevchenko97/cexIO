@@ -33,10 +33,10 @@ export class MiddleWares extends EventEmitter {
     }
 
     private async configApp(): Promise<void> {
-        // this.app.use(cors());
-        this.app.use(bodyParser.urlencoded({ extended: true }));
-        this.app.use(express.json());
-        this.app.use(bodyParser.json());
+        this.app.use(cors());
+        this.app.use(bodyParser.urlencoded({ extended: false }));
+        // this.app.use(express.json({limit: "10mb", extended: false}));
+        this.app.use(bodyParser.json({limit: "10mb"}));
         const sessionStore =  new RedisStore({ host: this.config.host, port: this.config.redisPort, client: this.redisClient });
         this.app.use(new session({
             name: "sid",
