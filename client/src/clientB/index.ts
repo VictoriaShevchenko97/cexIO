@@ -1,5 +1,6 @@
 import { BaseClient } from "../BaseClient";
 let request = require("request-with-cookies");
+
 const WebSocket = require("ws");
 
 interface IUploadData {
@@ -47,7 +48,7 @@ class ClientB extends BaseClient {
     }
 
     private initConnection(token: string) {
-        this.ws = new WebSocket(`ws://127.0.0.1:3001/?token=${token}`);
+        this.ws = new WebSocket(`ws://${this.config.host}:${this.config.wsPort}/?token=${token}`);
         this.ws.on("open", (ws: any) => {
             console.log("opened");
         });
@@ -57,6 +58,7 @@ class ClientB extends BaseClient {
                 let uploadData: IUploadData = event.message;
                 let isEnded = this.isEqualSizeFile(uploadData.currentSize, uploadData.userSize);
                 if (isEnded) console.log(uploadData.fileName + " saved!!!");
+
                 this.ws.send(JSON.stringify({tag: "uploadResult", fileName: uploadData.fileName, end: isEnded}));
             }
         });

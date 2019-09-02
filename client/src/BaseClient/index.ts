@@ -1,6 +1,19 @@
+import { readConfig, IConfig } from "../../lib/read-config";
+import { join } from "path";
 
 export class BaseClient {
-    public fullUrl = `http://127.0.0.1:3000`;
+    protected config: IConfig;
+    public fullUrl: string;
+
+    constructor() {
+        try {
+            this.config = readConfig(join(__dirname, "../", "/config.json"));
+            this.fullUrl = `http://${this.config.host}:${this.config.httpPort}`;
+        } catch (e) {
+            console.log(e.stack);
+            process.exit(1);
+        }
+    }
 
     loginClient(request: any): Promise<string> {
         return new Promise((resolve, reject) => {

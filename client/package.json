@@ -17,6 +17,7 @@
   "dependencies": {
     "@types/request": "^2.48.2",
     "@types/ws": "^6.0.3",
+    "arguard": "^1.2.1",
     "request": "^2.88.0",
     "request-with-cookies": "0.0.5",
     "ws": "^7.1.2"

@@ -14,7 +14,7 @@ interface IUploadData {
 
 let config: IConfig;
 try {
-    config = readConfig(join(__dirname, "/config.json"));
+    config = readConfig(join(__dirname, "../", "/config.json"));
 } catch (e) {
     console.log(e.stack);
     process.exit(1);
