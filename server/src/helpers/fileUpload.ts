@@ -1,10 +1,10 @@
 import * as fs from "fs";
 import { join } from "path";
 
-export function uploadDataInFile(sessionId: string, originNameFile: string, data: string, originSize: number): Promise<number> {
+export function uploadDataInFile(fileName: string, data: string, originSize: number): Promise<number> {
     return new Promise((resolve, reject) => {
         try {
-            const fullFileName = join(__dirname + "/files", sessionId + originNameFile);
+            const fullFileName = join(__dirname + "/files", fileName);
             if (! fs.existsSync(fullFileName)) {
                 fs.closeSync(fs.openSync(fullFileName, "a"));
             }

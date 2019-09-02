@@ -1,18 +1,51 @@
 import { Server } from "ws";
 import { EventEmitter } from "events";
 import { IConfig } from "../read-config";
-import { signedCookie } from "cookie-parser";
-import * as cookie from "cookie";
+import { parse } from "url";
 import { sign, verify } from "jsonwebtoken";
+const SECRET_KEY  = "hakuna-matata";
 
 export class WSSocketProcessor extends EventEmitter {
     private wss: Server;
+    private ws: any;
     private token: string;
-    constructor(private conf: IConfig) {
+    constructor(private conf: IConfig, httpServer: any) {
         super();
-        this.wss = new Server({ port: this.conf.wsPort });
-        this.token = sign({name: "CEX.IO"}, "hakuna-matata", {
+        this.token = sign({name: "CEX.IO"}, SECRET_KEY, {
             expiresIn : 10 * 24 * 60 * 60 * 1000 // 10 days
+        });
+        this.wss = new Server({
+            port: 3001,
+            verifyClient: (info, done) => {
+                let query = parse(info.req.url, true).query;
+                verify(query.token.toString(), SECRET_KEY, (err: Error) => {
+                if (err) return done(false, 403, "Not valid token");
+                done(true);
+                });
+            }
+        });
+        this.runListeners();
+    }
+    public sendMessage(data: any) {
+        this.wss.clients.forEach((ws) => {
+            ws.send(JSON.stringify ({
+                type: "upload",
+                message: data
+            }));
+        });
+    }
+    public runListeners() {
+        this.wss.on("connection", (ws) => {
+            this.ws = ws;
+            console.log(" new connection");
+            ws.on("message", (message: any) => {
+                let uploadData = JSON.parse(message);
+                if (uploadData.tag === "uploadResult") {
+                    if (uploadData.end) {
+                        console.log(`${uploadData.fileName} is ended`);
+                    }
+                }
+            });
         });
     }
 

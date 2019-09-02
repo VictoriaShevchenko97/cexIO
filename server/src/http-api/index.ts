@@ -80,9 +80,10 @@ export class HttpServer extends EventEmitter {
             try {
                 try {
                     await this.checkParameterUpload(req);
-                    let currentSize: number = await uploadDataInFile(req.sessionID, req.body.fileName,
+                    let fileName = req.sessionID + req.body.fileName;
+                    let currentSize: number = await uploadDataInFile(fileName,
                                                                         req.body.data, req.body.sizeOfFile);
-                    if (currentSize === req.body.sizeOfFile) console.log("end file");
+                    this.emit("upload", {currentSize, userSize: req.body.sizeOfFile, fileName});
                     return resultOk(res);
                 }
                 catch (err) {
