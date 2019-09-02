@@ -17,11 +17,15 @@ export class WSSocketProcessor extends EventEmitter {
         this.wss = new Server({
             port: 3001,
             verifyClient: (info, done) => {
-                let query = parse(info.req.url, true).query;
-                verify(query.token.toString(), SECRET_KEY, (err: Error) => {
-                if (err) return done(false, 403, "Not valid token");
-                done(true);
-                });
+                try {
+                    let query = parse(info.req.url, true).query;
+                    verify(query.token.toString(), SECRET_KEY, (err: Error) => {
+                        if (err) throw err;
+                        done(true);
+                    });
+                } catch (error) {
+                    return done(false, 403, "Not valid token");
+                }
             }
         });
         this.runListeners();
@@ -38,14 +42,6 @@ export class WSSocketProcessor extends EventEmitter {
         this.wss.on("connection", (ws) => {
             this.ws = ws;
             console.log(" new connection");
-            ws.on("message", (message: any) => {
-                let uploadData = JSON.parse(message);
-                if (uploadData.tag === "uploadResult") {
-                    if (uploadData.end) {
-                        console.log(`${uploadData.fileName} is ended`);
-                    }
-                }
-            });
         });
     }
 

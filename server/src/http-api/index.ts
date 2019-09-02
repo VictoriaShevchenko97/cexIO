@@ -9,8 +9,6 @@ import { uploadDataInFile } from "../helpers/fileUpload";
 const WRONG_FORMAT = "WRONG_FORMAT";
 const WRONG_SEQUENCE = "WRONG_SEQUENCE";
 const SYSTEM_ERROR = "SYSTEM_ERROR";
-const UNKNOWN_TAG = "UNKNOWN_TAG";
-const WRONG_TOKEN = "WRONG_TOKEN";
 const BIG_DATA    = "BIG_DATA";
 
 // макс. размер создаваемого файла в байтах (2 мб)
@@ -54,49 +52,39 @@ export class HttpServer extends EventEmitter {
             return resultOk(res, {});
         });
 
-        // TODO: try in try??? seriously?
         this.app.post("/subscribe", (req: any, res: any) => {
             try {
-                try {
-                    arguard.string(req.body.sessionId, "sessionID").nonempty();
-                    if (this.isWrongdSession(req.sessionID, req.body.sessionId)) {
-                        throw new SequenceError();
-                    }
-                }
-                catch (err) {
-                    if (err instanceof SequenceError) {
-                        return error(res, 400, err.message);
-                    }
-                    return error(res, 400, WRONG_FORMAT);
+                arguard.string(req.body.sessionId, "sessionID").nonempty();
+                if (this.isWrongdSession(req.sessionID, req.body.sessionId)) {
+                    throw new SequenceError();
                 }
             }
             catch (err) {
-                return error(res, 500, SYSTEM_ERROR);
+                if (err instanceof SequenceError) {
+                    return error(res, 400, err.message);
+                }
+                return error(res, 400, WRONG_FORMAT);
             }
             return resultOk(res, {token: this.token});
         });
 
         this.app.post("/upload", async (req: any, res: any) => {
             try {
-                try {
-                    await this.checkParameterUpload(req);
-                    let fileName = req.sessionID + req.body.fileName;
-                    let currentSize: number = await uploadDataInFile(fileName,
-                                                                        req.body.data, req.body.sizeOfFile);
-                    this.emit("upload", {currentSize, userSize: req.body.sizeOfFile, fileName});
-                    return resultOk(res);
+                await this.checkParameterUpload(req);
+                let fileName = req.sessionID + req.body.fileName;
+                let currentSize: number = await uploadDataInFile(fileName,
+                                                                    req.body.data, req.body.sizeOfFile);
+                this.emit("upload", {currentSize, userSize: req.body.sizeOfFile, fileName});
+                return resultOk(res);
+            }
+            catch (err) {
+                if (err instanceof SequenceError) {
+                    return error(res, 400, err.message);
                 }
-                catch (err) {
-                    if (err instanceof SequenceError) {
-                        return error(res, 400, err.message);
-                    }
-                    else if (err instanceof BigDataError) {
-                        return error(res, 401, err.message);
-                    }
-                    return error(res, 400, WRONG_FORMAT);
+                else if (err instanceof BigDataError) {
+                    return error(res, 401, err.message);
                 }
-            } catch (error) {
-                console.log("error");
+                return error(res, 400, WRONG_FORMAT);
             }
         });
 
@@ -109,6 +97,7 @@ export class HttpServer extends EventEmitter {
             console.log("\x1b[37m", "");
         });
     }
+
     private async checkParameterUpload(req: any) {
         arguard.string(req.body.sessionId, "sessionID").nonempty();
         arguard.string(req.body.data, "data").nonempty();
@@ -125,6 +114,7 @@ export class HttpServer extends EventEmitter {
             throw new BigDataError();
         }
     }
+
     private isWrongdSession(systemSessionId: string, userSessionId: string): boolean {
         if (systemSessionId !== userSessionId) {
             return true;

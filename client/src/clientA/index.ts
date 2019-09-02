@@ -12,6 +12,7 @@ class ClientA extends BaseClient {
     constructor() {
         super();
         this.clientRequest = request.createClient();
+        this.uploadBigFile();
     }
 
     async login() {
@@ -41,10 +42,10 @@ class ClientA extends BaseClient {
             };
             this.clientRequest(req);
         });
+
         fileObj.on("end", () => console.log("\nFile sended to server"));
     }
 }
 
 const clientA = new ClientA();
-clientA.uploadBigFile();
 
