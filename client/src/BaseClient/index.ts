@@ -1,5 +1,6 @@
 import { readConfig, IConfig } from "../../lib/read-config";
 import { join } from "path";
+import { ServerResponse } from "http";
 
 export class BaseClient {
     protected config: IConfig;
@@ -20,7 +21,7 @@ export class BaseClient {
             request({
                 url: this.fullUrl + "/login",
                 method: "POST"
-            }, (err: Error, httpResp: any, body: any) => {
+            }, (err: Error, httpResp: ServerResponse, body: any) => {
                 if (err) {
                     reject(err);
                 }

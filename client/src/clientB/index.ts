@@ -1,8 +1,7 @@
 import { BaseClient } from "../BaseClient";
 import * as arguard from "arguard";
+import WebSocket from "ws";
 let request = require("request-with-cookies");
-
-const WebSocket = require("ws");
 
 interface IUploadData {
     currentSize: number;
@@ -13,43 +12,18 @@ interface IUploadData {
 class ClientB extends BaseClient {
     private currentSessionId: string;
     private clientRequest: any;
-    private ws: any;
+    private ws: WebSocket;
 
     constructor() {
         super();
         this.clientRequest = request.createClient();
-        (async() => {
-            const sessionId: string = await this.loginClient(this.clientRequest);
-            this.currentSessionId = sessionId;
-            let token = await this.getToken();
-            this.initConnection(token);
-        })();
+        this.initConnection();
     }
 
-    private getToken(): Promise<string> {
-        return new Promise((resolve, reject) => {
-            const req = {
-                url: this.fullUrl + "/subscribe",
-                method: "POST",
-                json: true,
-                body: {
-                    sessionId: this.currentSessionId
-                }
-            };
-
-            this.clientRequest(req, (err: Error, httpResp: any, body: any) => {
-                if (err) reject(err.stack);
-                try {
-                    arguard.string(body.data.token, "token").nonempty();
-                    resolve(body.data.token);
-                } catch (err) {
-                    reject(err.stack);
-                }
-            });
-        });
-    }
-
-    private initConnection(token: string) {
+    private async initConnection() {
+        const sessionId: string = await this.loginClient(this.clientRequest);
+        this.currentSessionId = sessionId;
+        let token = await this.getToken();
         this.ws = new WebSocket(`ws://${this.config.host}:${this.config.wsPort}/?token=${token}`);
 
         this.ws.on("open", () => {
@@ -80,6 +54,29 @@ class ClientB extends BaseClient {
 
         this.ws.on("error", (err: Error) => {
             console.error(err.stack);
+        });
+    }
+
+    private getToken(): Promise<string> {
+        return new Promise((resolve, reject) => {
+            const req = {
+                url: this.fullUrl + "/subscribe",
+                method: "POST",
+                json: true,
+                body: {
+                    sessionId: this.currentSessionId
+                }
+            };
+
+            this.clientRequest(req, (err: Error, httpResp: any, body: any) => {
+                if (err) reject(err.stack);
+                try {
+                    arguard.string(body.data.token, "token").nonempty();
+                    resolve(body.data.token);
+                } catch (err) {
+                    reject(err.stack);
+                }
+            });
         });
     }
 
