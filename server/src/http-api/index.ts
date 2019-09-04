@@ -1,5 +1,4 @@
-const express = require("express");
-const cors = require("cors");
+
 const arguard = require("arguard");
 import { IConfig } from "../read-config";
 import { EventEmitter } from "events";

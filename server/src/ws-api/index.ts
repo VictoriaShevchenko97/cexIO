@@ -3,15 +3,16 @@ import { EventEmitter } from "events";
 import { IConfig } from "../read-config";
 import { parse } from "url";
 import { sign, verify } from "jsonwebtoken";
-const SECRET_KEY  = "hakuna-matata";
+interface IProcessArgv {
+    secretSession: string;
+    wsKey: string;
+}
 
-export class WSSocketProcessor extends EventEmitter {
+export class WSSocketProcessor {
     private wss: Server;
-    private ws: any;
     private token: string;
-    constructor(private conf: IConfig, httpServer: any) {
-        super();
-        this.token = sign({name: "CEX.IO"}, SECRET_KEY, {
+    constructor(private conf: IConfig & IProcessArgv, httpServer: any) {
+        this.token = sign({name: "CEX.IO"}, conf.wsKey, {
             expiresIn : 10 * 24 * 60 * 60 * 1000 // 10 days
         });
         this.wss = new Server({
@@ -19,7 +20,7 @@ export class WSSocketProcessor extends EventEmitter {
             verifyClient: (info, done) => {
                 try {
                     let query = parse(info.req.url, true).query;
-                    verify(query.token.toString(), SECRET_KEY, (err: Error) => {
+                    verify(query.token.toString(), conf.wsKey, (err: Error) => {
                         if (err) throw err;
                         done(true);
                     });
@@ -39,8 +40,7 @@ export class WSSocketProcessor extends EventEmitter {
         });
     }
     public runListeners() {
-        this.wss.on("connection", (ws) => {
-            this.ws = ws;
+        this.wss.on("connection", () => {
             console.log(" new connection");
         });
     }

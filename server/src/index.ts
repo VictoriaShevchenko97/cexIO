@@ -11,12 +11,21 @@ interface IUploadData {
     userSize: number;
     fileName: string;
 }
+interface IProcessArgv {
+    secretSession: string;
+    wsKey: string;
+}
 
-let config: IConfig;
+let config: IConfig & IProcessArgv;
 try {
     config = readConfig(join(__dirname, "../", "/config.json"));
+    if (process.argv.length < 4) {
+        throw new Error("Usage: secretSession and redisKey");
+    }
+    config.secretSession = process.argv[2];
+    config.wsKey = process.argv[3];
 } catch (e) {
-    console.log(e.stack);
+    console.error(e.message);
     process.exit(1);
 }
 
