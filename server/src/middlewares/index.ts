@@ -7,13 +7,16 @@ const RedisStore = require("connect-redis")(session);
 
 import { createClient } from "redis";
 import { IConfig } from "../read-config";
-import { EventEmitter } from "events";
 
-export class MiddleWares extends EventEmitter {
+interface IProcessArgv {
+    secretSession: string;
+    wsKey: string;
+}
+
+export class MiddleWares {
     private redisClient: any;
     private app: any;
-    constructor(private config: IConfig) {
-        super();
+    constructor(private config: IConfig & IProcessArgv) {
         try {
             this.redisClient = createClient(this.config.redisPort,
                             this.config.host);
@@ -35,12 +38,11 @@ export class MiddleWares extends EventEmitter {
     private async configApp(): Promise<void> {
         this.app.use(cors());
         this.app.use(bodyParser.urlencoded({ extended: false }));
-        // this.app.use(express.json({limit: "10mb", extended: false}));
         this.app.use(bodyParser.json({limit: "10mb"}));
         const sessionStore =  new RedisStore({ host: this.config.host, port: this.config.redisPort, client: this.redisClient });
         this.app.use(new session({
             name: "sid",
-            secret: "kqsdjfmlksdhfhzirzeoibrzecrbzuzefcuercazeafxzeokwdfzeijfxcerig",
+            secret: this.config.secretSession || "kqsdjfmlksdhfhzirzeoibrzecrbzuzefcuercazeafxzeokwdfzeijfxcerig",
             store: sessionStore,
             cookie: {
                 secure: false,
